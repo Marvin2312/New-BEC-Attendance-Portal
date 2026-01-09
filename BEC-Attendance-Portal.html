@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEC Attendance Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        .nav-bar {
+            background: #8B0000;
+            border-bottom: 3px solid #FFD700;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0px;
+        }
+
+        .logo-img {
+            height: 60px;  
+            width:  60px;    
+            object-fit: contain;
+        }
+
+        .logo-text h1 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: 600;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            margin: 0;
+            color: #FFD700;
+            margin-top: 2px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #8B0000;
+            border: 2px solid transparent;
+        }
+
+        .nav-btn.active {
+            background: #FFD700;
+            color: #8B0000;
+            border-color: #FFD700;
+        }
+
+        .nav-btn:hover {
+            background: #FFD700;
+            color: #8B0000;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            border: 2px solid #8B0000;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
+            border-color: #FFD700;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-icon.maroon {
+            background: #8B0000;
+            color: #FFD700;
+        }
+
+        .stat-icon.yellow {
+            background: #FFD700;
+            color: #8B0000;
+        }
+
+        .stat-card h3 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #8B0000;
+            line-height: 1;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.95em;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #8B0000;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px 32px;
+            border-bottom: 2px solid #FFD700;
+            background: #8B0000;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9em;
+            color: #FFD700;
+        }
+
+        .controls {
+            padding: 24px 32px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls input,
+        .controls select {
+            padding: 10px 16px;
+            border: 2px solid #8B0000;
+            border-radius: 8px;
+            font-size: 0.95em;
+            background: white;
+            color: #2d3748;
+            transition: all 0.2s;
+            min-width: 180px;
+        }
+
+        .controls input:focus,
+        .controls select:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #8B0000;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #660000;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #8B0000;
+            border: 2px solid #8B0000;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f8f8;
+        }
+
+        .btn-success {
+            background: #FFD700;
+            color: #8B0000;
+        }
+
+        .btn-success:hover {
+            background: #FFC700;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-danger {
+            background: #8B0000;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .btn-danger:hover {
+            background: #660000;
+        }
+
+        .table-container {
+            padding: 0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: #8B0000;
+            border-bottom: 2px solid #FFD700;
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1f1f1;
+            font-size: 0.95em;
+            color: #2d3748;
+        }
+
+        tr:hover {
+            background: #fff9e6;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #FFD700;
+            color: #8B0000;
+        }
+
+        .badge-success::before {
+            content: "●";
+            font-size: 12px;
+        }
+
+        .uid-code {
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #8B0000;
+            border: 1px solid #8B0000;
+        }
+
+        .grade-info {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #8B0000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 80px 20px;
+            color: #999;
+        }
+
+        .no-data-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Registration Page Styles */
+        .reg-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8B0000;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #8B0000;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #FFD700;
+            color: #8B0000;
+            border: 2px solid #8B0000;
+        }
+
+        .alert-info {
+            background: #fff9e6;
+            color: #8B0000;
+            border: 2px solid #FFD700;
+        }
+
+        .student-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            padding: 16px;
+            border: 2px solid #8B0000;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .student-item:hover {
+            border-color: #FFD700;
+            background: #fff9e6;
+        }
+
+        .student-info h3 {
+            font-size: 1.1em;
+            color: #8B0000;
+            margin-bottom: 4px;
+        }
+
+        .student-info p {
+            font-size: 0.9em;
+            color: #666;
+            margin: 2px 0;
+        }
+
+        @media (max-width: 968px) {
+            .reg-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-bar {
+                padding: 0 20px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .logo-text h1 {
+                font-size: 14px;
+            }
+
+            .logo-text p {
+                display: none;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .controls {
+                padding: 16px 20px;
+            }
+
+            .controls input,
+            .controls select,
+            .controls button {
+                width: 100%;
+                min-width: unset;
+            }
+
+            table {
+                font-size: 0.85em;
+            }
+            
+            th, td {
+                padding: 12px 10px;
+            }
+
+            .card-title {
+                font-size: 1.1em;
+            }
+
+            .nav-content {
+                flex-direction: column;
+                height: auto;
+                padding: 15px 0;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <div class="logo-section">
+                <img src="logo.png" alt="BEC Attendance Portal Logo" class="logo-img">
+                <div class="logo-text">
+                    <h1>BEC Attendance Portal</h1>
+                    <p>Real-time attendance monitoring</p>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn active" onclick="showPage('dashboard')">📊 Dashboard</button>
+                <button class="nav-btn" onclick="showPage('registration')">📝 Student Registration</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page active">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon maroon">📊</div>
+                    </div>
+                    <h3 id="totalRecords">0</h3>
+                    <p>Total Records</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon yellow">✓</div>
+                    </div>
+                    <h3 id="todayRecords">0</h3>
+                    <p>Today's Check-ins</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon maroon">👥</div>
+                    </div>
+                    <h3 id="uniqueUsers">0</h3>
+                    <p>Unique Users</p>
+                </div>
+            </div>
+
+            <div class="main-card">
+                <div class="card-header">
+                    <div class="card-title">Attendance Records</div>
+                    <div class="card-subtitle">View and manage all attendance entries</div>
+                </div>
+
+                <div class="controls">
+                    <input type="date" id="dateFilter" placeholder="Filter by date">
+                    <select id="userFilter">
+                        <option value="">All Users</option>
+                    </select>
+                    <select id="gradeLevelFilter">
+                        <option value="">All Grade Levels</option>
+                    </select>
+                    <button class="btn-primary" onclick="applyFilters()">Apply Filter</button>
+                    <button class="btn-secondary" onclick="clearFilters()">Clear</button>
+                    <button class="btn-success" onclick="exportData()">Export CSV</button>
+                </div>
+
+                <div class="table-container">
+                    <div id="loading" class="loading">
+                        <div class="loading-spinner"></div>
+                        <div>Loading attendance data...</div>
+                    </div>
+                    <div id="noData" class="no-data" style="display: none;">
+                        <div class="no-data-icon">📋</div>
+                        <div>No attendance records found</div>
+                    </div>
+                    <table id="attendanceTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Grade Level</th>
+                                <th>Section</th>
+                                <th>Card UID</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Page -->
+        <div id="registrationPage" class="page">
+            <div class="reg-grid">
+                <div class="main-card">
+                    <div class="card-header">
+                        <div class="card-title">📝 Register New Student</div>
+                        <div class="card-subtitle">Add student RFID card to the system</div>
+                    </div>
+                    <div style="padding: 30px;">
+                        <div id="successMessage" class="alert alert-success" style="display: none;">
+                            ✓ Student registered successfully!
+                        </div>
+
+                        <form id="registrationForm">
+                            <div class="form-group">
+                                <label>Student ID</label>
+                                <input type="text" id="studentID" placeholder="e.g., 2021-001" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="studentName" placeholder="e.g., John Doe" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Course</label>
+                                <select id="studentCourse" required>
+                                    <option value="">Select Course</option>
+                                    <option value="BSIT">BSIT - BS Information Technology</option>
+                                    <option value="BSCS">BSCS - BS Computer Science</option>
+                                    <option value="BSIS">BSIS - BS Information Systems</option>
+                                    <option value="ACT">ACT - Associate in Computer Technology</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Grade Level</label>
+                                <select id="gradeLevel" required>
+                                    <option value="">Select Grade Level</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                    <option value="Grade 11">Grade 11</option>
+                                    <option value="Grade 12">Grade 12</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Section</label>
+                                <input type="text" id="section" placeholder="e.g., A, B, STEM-1" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>RFID Card UID</label>
+                                <input type="text" id="cardUID" placeholder="Scan card or enter UID manually" required>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="width: 100%;">
+                                ✓ Register Student
+                            </button>
+                        </form>
+
+                        <div class="alert alert-info" style="margin-top: 20px;">
+                            <strong>💡 How to get Card UID:</strong><br>
+                            1. Upload the UID Reader code to ESP32<br>
+                            2. Open Serial Monitor (115200 baud)<br>
+                            3. Scan the RFID card<br>
+                            4. Copy the UID and paste it above
+                        </div>
+                    </div>
+                </div>
+
+                <div class="main-card">
+                    <div class="card-header">
+                        <div class="card-title">👥 Registered Students</div>
+                        <div class="card-subtitle">Total: <span id="studentCount">0</span> students</div>
+                    </div>
+                    <div style="padding: 30px;">
+                        <div id="studentList" class="student-list">
+                            <p style="text-align: center; color: #999; padding: 40px;">
+                                No students registered yet
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, set, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_TpVRL3kJUrLryXzH_KOPCIy1FVKRkwQ",
+            authDomain: "bec-attendance-portal.firebaseapp.com",
+            databaseURL: "https://bec-attendance-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "bec-attendance-portal",
+            storageBucket: "bec-attendance-portal.firebasestorage.app",
+            messagingSenderId: "381157652172",
+            appId: "1:381157652172:web:34b8ca52c44a7069e43469"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let allRecords = [];
+        let filteredRecords = [];
+
+        window.showPage = function(pageName) {
+            const pages = document.querySelectorAll('.page');
+            const buttons = document.querySelectorAll('.nav-btn');
+            
+            pages.forEach(page => page.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(pageName + 'Page').classList.add('active');
+            event.target.classList.add('active');
+        };
+
+        const attendanceRef = ref(database, 'attendance');
+        onValue(attendanceRef, (snapshot) => {
+            document.getElementById('loading').style.display = 'none';
+            
+            allRecords = [];
+            const data = snapshot.val();
+            
+            if (data) {
+                Object.keys(data).forEach(date => {
+                    Object.keys(data[date]).forEach(timestamp => {
+                        const record = data[date][timestamp];
+                        record.id = timestamp;
+                        allRecords.push(record);
+                    });
+                });
+                
+                allRecords.sort((a, b) => b.timestamp - a.timestamp);
+                filteredRecords = [...allRecords];
+                updateDisplay();
+                populateFilters();
+            } else {
+                document.getElementById('noData').style.display = 'block';
+            }
+        });
+
+        const studentsRef = ref(database, 'students');
+        onValue(studentsRef, (snapshot) => {
+            const studentListDiv = document.getElementById('studentList');
+            const data = snapshot.val();
+
+            if (data) {
+                const studentCount = Object.keys(data).length;
+                document.getElementById('studentCount').textContent = studentCount;
+                
+                studentListDiv.innerHTML = '';
+                Object.keys(data).forEach(studentID => {
+                    const student = data[studentID];
+                    studentListDiv.innerHTML += `
+                        <div class="student-item">
+                            <div class="student-info">
+                                <h3>${student.name}</h3>
+                                <p>ID: ${student.studentID} • ${student.course}</p>
+                                <p>${student.gradeLevel} - Section ${student.section}</p>
+                                <span class="uid-code">${student.uid}</span>
+                            </div>
+                            <button class="btn-danger" onclick="deleteStudent('${studentID}')">
+                                Delete
+                            </button>
+                        </div>
+                    `;
+                });
+            } else {
+                document.getElementById('studentCount').textContent = '0';
+                studentListDiv.innerHTML = `
+                    <p style="text-align: center; color: #999; padding: 40px;">
+                        No students registered yet
+                    </p>
+                `;
+            }
+        });
+
+        document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const studentID = document.getElementById('studentID').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const studentCourse = document.getElementById('studentCourse').value;
+            const gradeLevel = document.getElementById('gradeLevel').value;
+            const section = document.getElementById('section').value.trim();
+            const cardUID = document.getElementById('cardUID').value.trim().toUpperCase();
+
+            const studentData = {
+                studentID: studentID,
+                name: studentName,
+                course: studentCourse,
+                gradeLevel: gradeLevel,
+                section: section,
+                uid: cardUID,
+                registeredDate: new Date().toISOString()
+            };
+
+            try {
+                await set(ref(database, 'students/' + studentID), studentData);
+                
+                const successMsg = document.getElementById('successMessage');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+
+                document.getElementById('registrationForm').reset();
+                console.log('Student registered successfully!');
+            } catch (error) {
+                console.error('Error registering student:', error);
+                alert('Error registering student: ' + error.message);
+            }
+        });
+
+        window.deleteStudent = async function(studentID) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                try {
+                    await remove(ref(database, 'students/' + studentID));
+                    console.log('Student deleted successfully!');
+                } catch (error) {
+                    console.error('Error deleting student:', error);
+                    alert('Error deleting student: ' + error.message);
+                }
+            }
+        };
+
+        function updateDisplay() {
+            const tableBody = document.getElementById('tableBody');
+            const table = document.getElementById('attendanceTable');
+            const noData = document.getElementById('noData');
+            
+            if (filteredRecords.length === 0) {
+                table.style.display = 'none';
+                noData.style.display = 'block';
+                noData.innerHTML = '<div class="no-data-icon">📋</div><div>No records match your filters</div>';
+                return;
+            }
+            
+            table.style.display = 'table';
+            noData.style.display = 'none';
+            tableBody.innerHTML = '';
+            
+            filteredRecords.forEach((record, index) => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${record.name || 'Unknown'}</strong></td>
+                    <td><span class="grade-info">${record.gradeLevel || 'N/A'}</span></td>
+                    <td><span class="grade-info">${record.section || 'N/A'}</span></td>
+                    <td><span class="uid-code">${record.uid}</span></td>
+                    <td>${formatDate(record.date)}</td>
+                    <td>${record.time || 'N/A'}</td>
+                    <td><span class="badge badge-success">Present</span></td>
+                `;
+            });
+            
+            updateStats();
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === 'N/A') return 'N/A';
+            const year = dateStr.substring(0, 4);
+            const month = dateStr.substring(4, 6);
+            const day = dateStr.substring(6, 8);
+            return `${year}-${month}-${day}`;
+        }
+
+        function updateStats() {
+            document.getElementById('totalRecords').textContent = allRecords.length;
+            
+            const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const todayCount = allRecords.filter(r => r.date === today).length;
+            document.getElementById('todayRecords').textContent = todayCount;
+            
+            const uniqueUIDs = new Set(allRecords.map(r => r.uid));
+            document.getElementById('uniqueUsers').textContent = uniqueUIDs.size;
+        }
+
+        function populateFilters() {
+            const userFilter = document.getElementById('userFilter');
+            const uniqueUsers = [...new Set(allRecords.map(r => r.name))].filter(Boolean);
+            
+            userFilter.innerHTML = '<option value="">All Users</option>';
+            uniqueUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user;
+                option.textContent = user;
+                userFilter.appendChild(option);
+            });
+
+            const gradeLevelFilter = document.getElementById('gradeLevelFilter');
+            const uniqueGradeLevels = [...new Set(allRecords.map(r => r.gradeLevel))].filter(Boolean);
+            
+            gradeLevelFilter.innerHTML = '<option value="">All Grade Levels</option>';
+            uniqueGradeLevels.forEach(level => {
+                const option = document.createElement('option');
+                option.value = level;
+                option.textContent = level;
+                gradeLevelFilter.appendChild(option);
+            });
+        }
+
+        window.applyFilters = function() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const userFilter = document.getElementById('userFilter').value;
+            const gradeLevelFilter = document.getElementById('gradeLevelFilter').value;
+            
+            filteredRecords = allRecords.filter(record => {
+                let matches = true;
+                
+                if (dateFilter) {
+                    const filterDate = dateFilter.replace(/-/g, '');
+                    matches = matches && record.date === filterDate;
+                }
+                
+                if (userFilter) {
+                    matches = matches && record.name === userFilter;
+                }
+
+                if (gradeLevelFilter) {
+                    matches = matches && record.gradeLevel === gradeLevelFilter;
+                }
+                
+                return matches;
+            });
+            
+            updateDisplay();
+        };
+
+        window.clearFilters = function() {
+            document.getElementById('dateFilter').value = '';
+            document.getElementById('userFilter').value = '';
+            document.getElementById('gradeLevelFilter').value = '';
+            filteredRecords = [...allRecords];
+            updateDisplay();
+        };
+
+        window.exportData = function() {
+            let csv = 'No,Name,Grade Level,Section,Card UID,Date,Time,Status\n';
+            filteredRecords.forEach((record, index) => {
+                csv += `${index + 1},${record.name || 'Unknown'},${record.gradeLevel || 'N/A'},${record.section || 'N/A'},${record.uid},${formatDate(record.date)},${record.time || 'N/A'},Present\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `attendance_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+        };
+    </script>
+</body>
+</html>
